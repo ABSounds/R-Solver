@@ -1,11 +1,7 @@
 # R-Solver
 
-A Python tools for deriving R-Type adaptors for
+A Python tool for deriving R-Type adaptors for
 [Wave Digital Filters](https://github.com/jatinchowdhury18/WaveDigitalFilters).
-
-This code is not quite production-ready. If you are
-interested in contributing, please contact me through
-this repository.
 
 ## How It Works
 
