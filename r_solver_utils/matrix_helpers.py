@@ -1,4 +1,4 @@
-from sympy import Matrix, symbols, eye, solve, simplify
+from sympy import Matrix, symbols, eye, solve, simplify, SparseMatrix
 
 from r_solver_utils.element_stamps import stamp_element
 from r_solver_utils.element_stamps import RES_TYPE
@@ -7,8 +7,6 @@ from r_solver_utils.element_stamps import RES_TYPE
 def construct_X_matrix(elements, num_nodes, num_ports, num_extras):
     '''Constructs an \'X\' Matrix for doing MNA'''
     X_mat = Matrix.zeros(num_nodes + num_ports + num_extras, num_nodes + num_ports + num_extras)
-
-    print(f'X matrix shape: {X_mat.shape}')
 
     for el in elements:
         X_mat = stamp_element(X_mat, el, num_nodes, num_ports)

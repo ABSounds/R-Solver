@@ -2,35 +2,36 @@
 # The resulting Scattring matrics will be in terms
 # of the port impedance (Rp).
 
+from datetime import datetime
+
 import argparse
+from sympy import SparseMatrix
 from r_solver_utils.parse_netlist import parse_netlist
 from r_solver_utils.matrix_helpers import adapt_port, compute_S_matrix, construct_X_matrix, remove_datum_node
 from r_solver_utils.print_helpers import print_matrix, print_shape, verbose_print
 
 def main(args, custom_args=False):
+    # Print the start time (only the time part)
+    start_time = datetime.now()
+    print(f"Process started at: {start_time.strftime('%H:%M:%S')}")
+
     elements, num_nodes, num_ports, num_extras = parse_netlist(args.netlist)
     
     print('Constructing X matrix...')
     X_mat = construct_X_matrix(elements, num_nodes, num_ports, num_extras)
-    if args.verbose:
-        verbose_print(X_mat, 'Original X matrix:')
+    print(f'Shape of the initial X matrix: {X_mat.shape}')
     
     print('Removing datum node...')
     X_mat = remove_datum_node(X_mat, int(args.datum))
-    print(f'Shape of X matrix after removing datum node: {X_mat.shape}')
-    print(f'X matrix after removing datum node: {X_mat}')
-    if args.verbose:
-        verbose_print(X_mat, 'X matrix after removing datum node:')
+    X_mat = SparseMatrix(X_mat)
+    print(f'Shape of the X matrix after removing datum node: {X_mat.shape}')
 
-    # print('Simplifyig X matrix...')
-    # X_mat = X_mat.simplify()
-    # print(f'Shape of X matrix after simplifying: {X_mat.shape}')
+    print('Trying to simplify X matrix...')
+    X_mat = X_mat.simplify()
 
     print('Inverting X matrix...')
-    X_inv = X_mat.inv()
+    X_inv = X_mat.inv(method='LU', try_block_diag=True)
     del X_mat
-    if args.verbose:
-        verbose_print(X_inv, 'X matrix inverse:')
 
     print('Computing scattering matrix...')
     Scattering_mat, Rp = compute_S_matrix(X_inv, elements, num_ports, num_extras)
@@ -45,10 +46,12 @@ def main(args, custom_args=False):
         print('No port to adapt')
     
     print('Simplifying matrix...')
-    
-    Scattering_mat = Scattering_mat.simplify() # simplify_rational() is faster than simplify_full(), and seems to give the same answer.
+    Scattering_mat = Scattering_mat.simplify()
 
-    print('DONE!')
+    # Print the end time in the same format
+    end_time = datetime.now()
+    print(f"Process completed at: {end_time.strftime('%H:%M:%S')}")
+    print('All done!')
     print_matrix(Scattering_mat, args.out_file, num_ports, adapt_expr, args, custom_args)
 
 

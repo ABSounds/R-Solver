@@ -42,7 +42,6 @@ def parse_netlist(file):
                 node3=el_node3 - 1, node4=el_node4 - 1, gain=el_gain
             ))
         else:
-            print(f'Adding element: {el_type} {el_node1} {el_node2} {el_impedance}')
             elements.append(Element(
                 type=el_type, node1=el_node1 - 1, node2=el_node2 - 1,
                 impedance=sp.symbols(el_impedance), port=port

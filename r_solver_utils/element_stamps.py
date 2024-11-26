@@ -46,13 +46,10 @@ def stamp_vcvs(X_matrix, vcvs, num_nodes, num_ports):
 
 def stamp_element(X_matrix, element, num_nodes, num_ports):
     if element.type == 'RES':
-        print(f'Stamping resistor: {element}')
         X_matrix = stamp_resistor(X_matrix, element)
     elif element.type == 'VOLTAGE':
-        print(f'Stamping voltage source: {element}')
         X_matrix = stamp_voltage(X_matrix, element, num_nodes)
     elif element.type == VCVS_TYPE:
-        print(f'Stamping VCVS: {element}')
         X_matrix = stamp_vcvs(X_matrix, element, num_nodes, num_ports)
     
     return X_matrix
