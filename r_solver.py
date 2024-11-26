@@ -10,26 +10,43 @@ from r_solver_utils.print_helpers import print_matrix, print_shape, verbose_prin
 def main(args, custom_args=False):
     elements, num_nodes, num_ports, num_extras = parse_netlist(args.netlist)
     
+    print('Constructing X matrix...')
     X_mat = construct_X_matrix(elements, num_nodes, num_ports, num_extras)
     if args.verbose:
         verbose_print(X_mat, 'Original X matrix:')
-
+    
+    print('Removing datum node...')
     X_mat = remove_datum_node(X_mat, int(args.datum))
+    print(f'Shape of X matrix after removing datum node: {X_mat.shape}')
+    print(f'X matrix after removing datum node: {X_mat}')
     if args.verbose:
         verbose_print(X_mat, 'X matrix after removing datum node:')
 
-    X_inv = X_mat.inverse()
+    # print('Simplifyig X matrix...')
+    # X_mat = X_mat.simplify()
+    # print(f'Shape of X matrix after simplifying: {X_mat.shape}')
+
+    print('Inverting X matrix...')
+    X_inv = X_mat.inv()
+    del X_mat
     if args.verbose:
         verbose_print(X_inv, 'X matrix inverse:')
 
+    print('Computing scattering matrix...')
     Scattering_mat, Rp = compute_S_matrix(X_inv, elements, num_ports, num_extras)
+    del X_inv
 
     port_to_adapt = int(args.adapted_port)
     adapt_expr = None
     if port_to_adapt >= 0:
+        print('Adapting port...')
         Scattering_mat, adapt_expr = adapt_port(Scattering_mat, Rp, port_to_adapt)
+    else:
+        print('No port to adapt')
     
-    Scattering_mat = Scattering_mat.simplify_rational() # simplify_rational() is faster than simplify_full(), and seems to give the same answer.
+    print('Simplifying matrix...')
+    
+    Scattering_mat = Scattering_mat.simplify() # simplify_rational() is faster than simplify_full(), and seems to give the same answer.
 
     print('DONE!')
     print_matrix(Scattering_mat, args.out_file, num_ports, adapt_expr, args, custom_args)
