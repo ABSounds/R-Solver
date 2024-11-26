@@ -7,7 +7,7 @@ A Python tool for deriving R-Type adaptors for
 
 In order to use this script, you must have the [SymPy](https://www.sympy.org/)
 package installed. You can run the `r_solver.py` script from command line using
-using the command `python r_solver.py my_netlist.txt`, to generate a scattering
+the command `python r_solver.py my_netlist.txt`, to generate a scattering
 matrix for a given netlist. For more options, use `r_solver.py --help`.
 
 ## Netlist Format
