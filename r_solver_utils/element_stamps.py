@@ -1,4 +1,4 @@
-from sage.all import var
+import sympy as sp
 from r_solver_utils.element import RES_TYPE, VOLTAGE_TYPE, VCVS_TYPE
 
 def stamp_resistor(X_matrix, resistor):
@@ -21,8 +21,8 @@ def stamp_voltage(X_matrix, voltage, num_nodes):
 
 
 def stamp_vcvs(X_matrix, vcvs, num_nodes, num_ports):
-    R_in = var('Ri')
-    R_out = var('Ro')
+    R_in = sp.symbols('Ri')
+    R_out = sp.symbols('Ro')
     extra_idx = num_nodes + num_ports
 
     X_matrix[extra_idx + vcvs.port, vcvs.node1] += -vcvs.gain
@@ -45,11 +45,14 @@ def stamp_vcvs(X_matrix, vcvs, num_nodes, num_ports):
 
 
 def stamp_element(X_matrix, element, num_nodes, num_ports):
-    if element.type == RES_TYPE:
+    if element.type == 'RES':
+        print(f'Stamping resistor: {element}')
         X_matrix = stamp_resistor(X_matrix, element)
-    elif element.type == VOLTAGE_TYPE:
+    elif element.type == 'VOLTAGE':
+        print(f'Stamping voltage source: {element}')
         X_matrix = stamp_voltage(X_matrix, element, num_nodes)
     elif element.type == VCVS_TYPE:
+        print(f'Stamping VCVS: {element}')
         X_matrix = stamp_vcvs(X_matrix, element, num_nodes, num_ports)
     
     return X_matrix
